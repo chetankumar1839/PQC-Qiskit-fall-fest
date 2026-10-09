@@ -217,7 +217,7 @@ Team Information
 -               k.Dhanu Sri
 -               k.Siddhardha
 - Event: IBM Qiskit Fall Fest
-- Repository: Add your public GitHub URL
+- Repository: https://github.com/chetankumar1839/PQC-Qiskit-fall-fest
 
 Disclaimer: This project is an educational prototype and is not a certified security product or legal land-record system.
 
