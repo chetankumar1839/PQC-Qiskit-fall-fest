@@ -79,25 +79,30 @@ Our system analyzes transaction behavior, calculates risk, applies configurable 
 
 4. System Architecture
 
-flowchart TD
-    A[Land Documents] --> B[Digitization and Validation]
-    B --> C[Historical Record Database]
-    D[Official Proposes Change] --> E[Transaction Validation]
+
+    flowchart TD
+    A[Physical Land Records] --> B[Digitization and OCR]
+    B --> C[Historical Land Record Database]
+    D[Authorized Official] --> E[Land Change Request]
     C --> E
-    E --> F[Risk Feature Extraction]
-    F --> G[Classical AI Risk Analysis]
-    F --> H[Qiskit Circuit Simulation]
-    G --> I[Combined Risk Score]
-    H --> I
-    I --> J{Security Controller}
-    J -->|0–30%| K[Monitor and Log]
-    J -->|Above 30–50%| L[Key Rotation Workflow]
-    J -->|Above 50%| M[Block and Quarantine]
-    L --> N[Alerts and Audit Trail]
-    K --> N
-    M --> O[Notify Owner and Supervisor]
-    O --> P[Human Verification]
-    P --> N
+    E --> F[Transaction Validation]
+    F --> G[Feature Extraction]
+    G --> H[Classical AI Risk Analysis]
+    G --> I[Qiskit Quantum Circuit]
+    H --> J[Combined Risk Score]
+    I --> J
+    J --> K{PQC Security Controller}
+    K -->|0–30%| L[Monitor and Log]
+    K -->|Above 30–50%| M[Rotate Keys]
+    K -->|Above 50%| N[Block and Quarantine]
+    L --> O[Audit Trail]
+    M --> O
+    N --> P[Alert Landowner and Supervisor]
+    P --> Q[Human Verification]
+    Q --> O
+    Q --> R[Approve or Reject Transaction]
+    R --> C
+    O --> S[Tamper-Evident Hash Chain]
 
 5. How the System Works
 
