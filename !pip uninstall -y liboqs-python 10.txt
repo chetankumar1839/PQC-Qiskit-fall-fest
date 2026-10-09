@@ -1,0 +1,2 @@
+!pip uninstall -y liboqs-python
+!rm -rf /root/oqs /root/liboqs

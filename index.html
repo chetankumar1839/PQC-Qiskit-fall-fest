@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantum-Safe Land Records</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#07111f;color:#eef5ff;margin:0}
+    header{padding:22px 28px;background:#0d1b2d;border-bottom:1px solid #27415e}
+    h1{margin:0 0 6px} .sub{color:#9eb5cc}
+    main{max-width:1200px;margin:24px auto;padding:0 18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .card{background:#0d1b2d;border:1px solid #294762;border-radius:14px;padding:18px}
+    label{display:block;margin:10px 0 5px;color:#a9bfd3}
+    input,select{width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid #3b5871;background:#081421;color:white}
+    button{margin-top:15px;padding:11px 16px;border:0;border-radius:8px;background:#7c5cff;color:white;font-weight:bold;cursor:pointer}
+    .risk{font-size:42px;font-weight:800;margin:8px 0}
+    .normal{color:#6ee7a0}.warn{color:#ffd166}.danger{color:#ff6b81}
+    pre{white-space:pre-wrap;max-height:300px;overflow:auto;background:#07111f;padding:12px;border-radius:8px}
+    table{width:100%;border-collapse:collapse}td,th{padding:9px;border-bottom:1px solid #263c51;text-align:left}
+    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Quantum-Safe Land Record Security</h1>
+  <div class="sub">AI monitoring + Qiskit quantum risk + PQC wrapper + DLT-style audit trail</div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>Submit Land-Record Change</h2>
+      <form id="txForm">
+        <label>Survey No.</label>
+        <select id="survey_no"></select>
+        <label>Official</label>
+        <select id="official_id"></select>
+        <label>New Area (acres)</label>
+        <input id="new_area" type="number" step="0.01" value="3.30" required>
+        <label><input id="doc" type="checkbox" checked> Document consistent</label>
+        <label><input id="jur" type="checkbox" checked> Jurisdiction matches</label>
+        <label><input id="login" type="checkbox"> Login/session anomaly</label>
+        <label>Repeated modifications</label>
+        <input id="repeat" type="number" min="0" value="0">
+        <button>Analyze & Submit</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Security Decision</h2>
+      <div id="risk" class="risk">—</div>
+      <div id="decision">Submit a transaction to see the result.</div>
+      <pre id="details">Waiting...</pre>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:18px">
+    <h2>Recent Transactions</h2>
+    <table>
+      <thead><tr><th>TX</th><th>Survey</th><th>Official</th><th>Risk</th><th>Decision</th><th>Status</th></tr></thead>
+      <tbody id="txTable"></tbody>
+    </table>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <h2>Alerts</h2>
+    <pre id="alerts">Loading...</pre>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <h2>DLT Audit Chain</h2>
+    <pre id="audit">Loading...</pre>
+  </section>
+</main>
+
+<script>
+const api = "/api";
+
+async function loadOptions(){
+  const [officials, records] = await Promise.all([
+    fetch(api+"/officials").then(r=>r.json()),
+    fetch(api+"/land-records").then(r=>r.json())
+  ]);
+  survey_no.innerHTML = records.map(x =>
+    `<option value="${x.survey_no}">${x.survey_no} — ${x.owner_name} (${x.area_acres} acres)</option>`
+  ).join("");
+  official_id.innerHTML = officials.map(x =>
+    `<option value="${x.official_id}">${x.official_id} — ${x.name}</option>`
+  ).join("");
+}
+
+async function submitTx(e){
+  e.preventDefault();
+  const body = {
+    survey_no: survey_no.value,
+    official_id: official_id.value,
+    new_area: Number(new_area.value),
+    document_consistent: doc.checked,
+    jurisdiction_match: jur.checked,
+    login_security_anomaly: login.checked,
+    repeated_modifications: Number(repeat.value)
+  };
+  const res = await fetch(api+"/transactions", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+  const data = await res.json();
+  if(!res.ok){ details.textContent = JSON.stringify(data,null,2); return; }
+
+  risk.textContent = data.risk_percent + "%";
+  risk.className = "risk " + (data.risk_percent > 50 ? "danger" : data.risk_percent > 30 ? "warn" : "normal");
+  decision.textContent = `${data.decision} — ${data.status}`;
+  details.textContent = JSON.stringify(data,null,2);
+  await refresh();
+}
+
+async function refresh(){
+  const tx = await fetch(api+"/transactions").then(r=>r.json());
+  txTable.innerHTML = tx.map(x =>
+    `<tr><td>${x.tx_id}</td><td>${x.survey_no}</td><td>${x.official_id}</td>
+     <td>${(x.combined_risk*100).toFixed(1)}%</td><td>${x.decision}</td><td>${x.status}</td></tr>`
+  ).join("");
+
+  const alertsData = await fetch(api+"/alerts").then(r=>r.json());
+  alerts.textContent = JSON.stringify(alertsData,null,2);
+
+  const auditData = await fetch(api+"/audit").then(r=>r.json());
+  audit.textContent = JSON.stringify(auditData,null,2);
+}
+
+txForm.addEventListener("submit", submitTx);
+loadOptions().then(refresh);
+</script>
+</body>
+</html>

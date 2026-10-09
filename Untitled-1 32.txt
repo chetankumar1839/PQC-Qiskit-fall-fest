@@ -1,0 +1,34 @@
+summary = """
+ML-DSA-65 Digital Signature Project
+===================================
+
+Algorithm: ML-DSA-65
+Library: liboqs / liboqs-python
+
+Demonstrated:
+1. ML-DSA-65 availability
+2. Key-pair generation
+3. Digital signature generation
+4. Signature verification
+5. Tamper detection
+6. File signing
+7. File verification
+
+Key sizes:
+- Public key: 1952 bytes
+- Secret key: 4032 bytes
+- Signature: 3309 bytes
+
+Result:
+Original files verify successfully.
+Modified files are rejected.
+"""
+
+with open("ML_DSA_Project/README.txt", "w") as f:
+    f.write(summary)
+
+print("✅ Project summary created!")
+print("\nML_DSA_Project now contains:")
+import os
+for filename in os.listdir("ML_DSA_Project"):
+    print(" -", filename)

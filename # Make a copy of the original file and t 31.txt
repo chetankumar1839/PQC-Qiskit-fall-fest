@@ -1,0 +1,11 @@
+# Make a copy of the original file and tamper with it
+with open("message.txt", "rb") as f:
+    data = f.read()
+
+tampered = data + b" TAMPERED!"
+
+with open("tampered_message.txt", "wb") as f:
+    f.write(tampered)
+
+# Verify the tampered file using the original signature
+verify_file("tampered_message.txt", "message.txt.sig")
