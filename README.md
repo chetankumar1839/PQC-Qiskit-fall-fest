@@ -162,7 +162,7 @@ Update this structure to match the files actually uploaded to your repository.
 
 Install Python and Git, then clone the repository:
 
-git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+git clone https://github.com/chetankumar1839/PQC-Qiskit-fall-fest.git
 cd YOUR-REPOSITORY
 python -m venv .venv
 
